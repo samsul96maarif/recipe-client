@@ -1,0 +1,17 @@
+/*
+ * Author: Samsul Ma'arif <samsulma828@gmamil.com>
+ * Copyright (c) 2020.
+ */
+
+.custom-ellipsis {
+    box-sizing: border-box;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    white-space: nowrap;
+}
+
+div.custom-ellipsis:hover {
+    overflow: visible !important;
+    height: 100%;
+    white-space: normal;
+}
