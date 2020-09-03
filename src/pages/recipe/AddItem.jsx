@@ -4,12 +4,13 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react';
-import { makeStyles, withStyles, createMuiTheme} from "@material-ui/core/styles";
+import {makeStyles, withStyles} from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card"
 import {Button, CardContent, CardHeader, Container, Grid} from "@material-ui/core";
 import TextField from '@material-ui/core/TextField';
-import { purple } from '@material-ui/core/colors';
+import {purple} from '@material-ui/core/colors';
 import {Link, withRouter} from "react-router-dom";
+import backgroundImage from "../../assets/images/food.png"
 
 const baseApiUrl = "http://localhost:3001/recipes"
 
@@ -38,6 +39,7 @@ today = dd + '/' + mm + "/" + yyyy;
 function AddItem(props) {
     const classes = useStyles()
     const uploadedImage = useRef(null)
+    const [deviceHeight, setDeviceHeight] = useState(0)
     const [editedItem, setEditedItem] = useState({
         name: "",
         image: null,
@@ -77,15 +79,8 @@ function AddItem(props) {
         fileInput.type = "file"
     }
 
-    const validation = () => {
-        return true
-    }
-
     const handleSubmit = e => {
         e.preventDefault()
-        if (!validation()) {
-            return
-        }
 
         let formData = new FormData()
         Object.keys(editedItem).forEach(key => {
@@ -115,19 +110,28 @@ function AddItem(props) {
             .catch(err => console.log("error : " + err))
     }
 
+    useEffect(() => {
+        setDeviceHeight(document.documentElement.clientHeight)
+    }, [])
+
     return (
         <>
-            <Container style={{padding: 10}}>
+            <Container style={{
+                paddingTop: 30,
+                height: deviceHeight,
+                backgroundImage: `url(${backgroundImage})`,
+                maxWidth: "100%"
+            }}>
                 <Grid container justify={"center"}>
                     <Grid item xs={12} sm={6}>
-                        <Card variant="outlined" style={{textShadow: 10}}>
+                        <Card variant="outlined" style={{boxShadow: "50px"}}>
                             <CardHeader
                                 title="Add Your Recipe"
                                 subheader={today}
                             />
                             <form onSubmit={handleSubmit}>
                                 <CardContent>
-                                    <Grid container justify={"center"}>
+                                    <Grid container>
                                         <Grid item xs={12} sm={6} style={{textAlign: "left"}}>
                                             <label htmlFor="name">Image <span
                                                 className="required">*</span></label>
@@ -144,41 +148,46 @@ function AddItem(props) {
                                                     style={{
                                                         width: "100%",
                                                         height: "100%",
-                                                        // position: "absolute"
                                                     }}
                                                 />
                                             </div>
                                             <input className={"product-image"} name={"product_image"} required
-                                                   onChange={handleImageUpload} type="file" accept="image/*" multiple={false}/>
+                                                   onChange={handleImageUpload} type="file" accept="image/*"
+                                                   multiple={false}/>
                                         </Grid>
-                                        <Grid container item xs={12} sm={6}>
-                                            <TextField label="Recipe Name"
-                                                       inputProps={{
-                                                           required: true,
-                                                           name: "name",
-                                                           value: editedItem.name,
-                                                           onChange: handleChange
-                                                       }}
-                                            />
-                                            <TextField
-                                                label="Description"
-                                                multiline
-                                                rows={4}
-                                                inputProps={{
-                                                    required: true,
-                                                    name: "description",
-                                                    value: editedItem.description,
-                                                    onChange: handleChange
-                                                }}
-                                            />
+                                        <Grid container item xs={12} sm>
+                                            <Grid item xs={12} sm={12}>
+                                                <TextField style={{marginTop:10}} label="Recipe Name"
+                                                           inputProps={{
+                                                               required: true,
+                                                               name: "name",
+                                                               value: editedItem.name,
+                                                               onChange: handleChange
+                                                           }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={12}>
+                                                <TextField
+                                                    label="Description"
+                                                    multiline
+                                                    rows={4}
+                                                    inputProps={{
+                                                        required: true,
+                                                        name: "description",
+                                                        value: editedItem.description,
+                                                        onChange: handleChange
+                                                    }}
+                                                />
+                                            </Grid>
                                         </Grid>
                                         <br/>
                                     </Grid>
                                 </CardContent>
-                                <ColorButton variant="contained" color="primary" className={classes.margin} type={"submit"}>
+                                <ColorButton variant="contained" color="primary" className={classes.margin}
+                                             type={"submit"}>
                                     Save
                                 </ColorButton>
-                                <Link to={"/"} style={{textDecoration:"none"}}>
+                                <Link to={"/"} style={{textDecoration: "none"}}>
                                     <Button color={"secondary"} variant={"contained"}>
                                         Cancel
                                     </Button>

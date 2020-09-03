@@ -10,8 +10,7 @@ import Card from "@material-ui/core/Card"
 import {Button, CardContent, CardHeader, Container, Grid} from "@material-ui/core";
 import TextField from '@material-ui/core/TextField';
 import { purple } from '@material-ui/core/colors';
-
-import backgoroundImage from "../../assets/images/red-fruits.jpg"
+import backgroundImage from "../../assets/images/food.png";
 
 const baseApiUrl = "http://localhost:3001/recipes"
 
@@ -42,6 +41,7 @@ function EditItem(props) {
     const uploadedImage = useRef(null)
     const [loading, setLoading] = useState(true)
     const [recipe, setRecipe] = useState({})
+    const [deviceHeight, setDeviceHeight] = useState(0)
     const [editedItem, setEditedItem] = useState({
         name: "",
         image: null,
@@ -49,8 +49,7 @@ function EditItem(props) {
     })
 
     const getData = id => {
-        console.log("id : ", id)
-        fetch("http://localhost:3001/recipes/" + id, {
+        fetch(baseApiUrl + "/" + id, {
             headers: {
                 accept: "application/json"
             }
@@ -66,10 +65,15 @@ function EditItem(props) {
                     description: res.data.description
                 })
                 setRecipe(res.data)
-                return res
+                return res.data
             })
-            .then(res => setLoading(true))
-            .catch(err => console.log("error : "+err))
+            .then(res => setLoading(false))
+            .catch(err => {
+                alert("something error")
+                console.log("error : "+err)
+                setLoading(false)
+                props.history.push("/")
+            })
     }
 
     const handleChange = e => {
@@ -105,15 +109,8 @@ function EditItem(props) {
         fileInput.type = "file"
     }
 
-    const validation = () => {
-        return true
-    }
-
     const handleSubmit = e => {
         e.preventDefault()
-        if (!validation()) {
-            return
-        }
 
         if(recipe.image === editedItem.image){
             delete editedItem.image
@@ -124,7 +121,7 @@ function EditItem(props) {
         })
         // formData.append("_method", "PUT")
 
-        fetch(baseApiUrl + "/" + props.match.params.recipeId, {
+        fetch(baseApiUrl + "/" + recipe._id, {
             headers: {
                 accept: "application/json",
             },
@@ -149,19 +146,19 @@ function EditItem(props) {
 
     useEffect(() => {
         getData(props.match.params.recipeId)
+        setDeviceHeight(document.documentElement.clientHeight)
     },[])
 
-    const coba = document.documentElement.clientHeight
+    if(loading){
+        return null
+    }
     return (
         <>
             <Container style={{
-                padding:10,
-                marginLeft:0,
-                marginRight:0,
-                backgroundImage: `url(${backgoroundImage})`,
-                backgroundSize: "cover",
-                maxWidth:"100%",
-                height: coba
+                paddingTop: 30,
+                height: deviceHeight,
+                backgroundImage: `url(${backgroundImage})`,
+                maxWidth: "100%"
             }} maxWidth={"lg"}>
                 <Grid container justify={"center"} alignItems={"center"} style={{verticalAlign:"middle"}}>
                     <Grid item xs={12} sm={6}>
@@ -172,7 +169,7 @@ function EditItem(props) {
                             />
                             <form onSubmit={handleSubmit}>
                                 <CardContent>
-                                    <Grid container justify={"center"}>
+                                    <Grid container>
                                         <Grid item xs={12} sm={6} style={{textAlign: "left"}}>
                                             <label htmlFor="name">Image <span
                                                 className="required">*</span></label>
@@ -190,33 +187,37 @@ function EditItem(props) {
                                                     style={{
                                                         width: "100%",
                                                         height: "100%",
-                                                        // position: "absolute"
                                                     }}
                                                 />
                                             </div>
                                             <input className={"product-image"} name={"product_image"}
                                                    onChange={handleImageUpload} type="file" accept="image/*" multiple={false}/>
                                         </Grid>
+                                        <br/>
                                         <Grid container item xs={12} sm={6}>
-                                            <TextField label="Recipe Name"
-                                                       inputProps={{
-                                                           required: true,
-                                                           name: "name",
-                                                           value: editedItem.name,
-                                                           onChange: handleChange
-                                                       }}
-                                            />
-                                            <TextField
-                                                label="Description"
-                                                multiline
-                                                rows={4}
-                                                inputProps={{
-                                                    required: true,
-                                                    name: "description",
-                                                    value: editedItem.description,
-                                                    onChange: handleChange
-                                                }}
-                                            />
+                                            <Grid item xs={12} sm={12}>
+                                                <TextField style={{marginTop:10}} label="Recipe Name"
+                                                           inputProps={{
+                                                               required: true,
+                                                               name: "name",
+                                                               value: editedItem.name,
+                                                               onChange: handleChange
+                                                           }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={12}>
+                                                <TextField
+                                                    label="Description"
+                                                    multiline
+                                                    rows={4}
+                                                    inputProps={{
+                                                        required: true,
+                                                        name: "description",
+                                                        value: editedItem.description,
+                                                        onChange: handleChange
+                                                    }}
+                                                />
+                                            </Grid>
                                         </Grid>
                                         <br/>
                                     </Grid>
